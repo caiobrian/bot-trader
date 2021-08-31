@@ -1,1 +1,1 @@
-# Boilerplate feito com create-react-app
+# Bot para estudo da api da Binance
