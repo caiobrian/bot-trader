@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { useState } from 'react'
 import useWebSocket from 'react-use-websocket'
 
@@ -24,9 +25,28 @@ export function useExchangeStream() {
 
   const symbol = config.symbol.toLowerCase()
 
+  function buyNow() {
+    axios
+      .post('https://localhost:3001/BUY/' + config.symbol + '/0.01')
+      .then((result) => {
+        console.log(result.data)
+      })
+      .catch((err) => console.error(err))
+  }
+
+  function sellNow() {
+    axios
+      .post('https://localhost:3001/SELL/' + config.symbol + '/0.01')
+      .then((result) => {
+        console.log(result.data)
+      })
+      .catch((err) => console.error(err))
+  }
+
   function processData(ticker) {
     const lastPrice = parseFloat(ticker.c)
     if (config.side === 'BUY' && config.buy > 0 && lastPrice <= config.buy) {
+      buyNow()
       setConfig((prevState) => ({ ...prevState, side: 'SELL' }))
       setProfit({
         value: profit.value,
@@ -38,6 +58,7 @@ export function useExchangeStream() {
       config.sell > profit.lastBuy &&
       lastPrice >= config.sell
     ) {
+      sellNow()
       setConfig((prevState) => ({ ...prevState, side: 'BUY' }))
 
       const lastProfit = lastPrice - profit.lastBuy
